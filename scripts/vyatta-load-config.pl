@@ -170,6 +170,10 @@ while (<$cfg>) {
         $valid_cfg = 1;
         last;
     }
+    elsif (/vyos-config-version/) {
+        $valid_cfg = 1;
+        last;
+    }
 }
 if ( $xorp_cfg or !$valid_cfg ) {
     if ($xorp_cfg) {
@@ -192,7 +196,7 @@ my $login = getlogin() || getpwuid($<) || "unknown";
 syslog( "warning", "Load config [$orig_load_file] by $login" );
 
 # do config migration
-system("$vyos_libexec_dir/run-config-migration.pl $load_file");
+system("$vyos_libexec_dir/run-config-migration.py $load_file");
 
 # note: "load" is now handled in the backend so only "merge" is actually
 # handled in this script. "merge" hasn't been moved into the backend since
