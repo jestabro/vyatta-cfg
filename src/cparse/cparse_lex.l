@@ -3,6 +3,7 @@
 %x sID
 %x sValue
 %x sQStr
+%x nsComment
 %option noyywrap
 
 ID ([-[:alnum:]_]+)
@@ -113,6 +114,19 @@ free_str()
   free_str();
   BEGIN(INITIAL);
   return COMMENT;
+}
+
+<INITIAL>"//" {
+  BEGIN(nsComment);
+}
+
+<nsComment>[^\n]* {
+  ;
+}
+
+<nsComment>\n {
+  BEGIN(INITIAL);
+  return 0;
 }
 
 <INITIAL>! {
