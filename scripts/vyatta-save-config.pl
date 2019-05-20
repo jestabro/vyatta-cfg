@@ -77,7 +77,7 @@ if ($mode eq 'local' and !($save_file =~ /^\//)) {
     $save_file = "$bootpath/$save_file";
 }
 
-my $version_str = `/usr/libexec/vyos/vyatta-system-versions-foot.py`;
+my $version_str = `/usr/libexec/vyos/vyos-system-versions-foot.py`;
 
 # when presenting to users, show shortened /config path
 my $shortened_save_file = get_short_config_path($save_file);
