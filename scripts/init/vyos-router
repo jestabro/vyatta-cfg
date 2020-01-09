@@ -66,6 +66,13 @@ disabled () {
     grep -q -w no-vyos-$1 /proc/cmdline
 }
 
+# update system component versions
+update_versions () {
+    if [ -x $vyos_libexec_dir/update-system-component-versions.py ]; then
+        $vyos_libexec_dir/update-system-component-versions.py
+    fi
+}
+
 # if necessary, provide initial config
 init_bootfile () {
    if [ ! -r $BOOTFILE ] ; then
@@ -198,6 +205,8 @@ start ()
     mount -o $tmpfs_opts -t tmpfs none ${vyatta_configdir} \
       && chgrp ${GROUP} ${vyatta_configdir}
     log_action_end_msg $?
+
+    disabled versions || update_versions
 
     disabled bootfile || init_bootfile
 
