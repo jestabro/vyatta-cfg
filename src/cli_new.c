@@ -2299,10 +2299,11 @@ system_out(char *cmd, const char *prepend_msg, boolean eloc)
             if (eloc) {
               /* XXX prepend errloc since we want it */
               fprintf(out_stream, "%s", errloc_str);
-            }
-            /* XXX and in such cases we DO want prepend_msg */
-            if (prepend_msg) {
-              fprintf(out_stream, "[%s]\n", prepend_msg);
+
+              /* XXX and in such cases we DO want prepend_msg */
+              if (prepend_msg) {
+                fprintf(out_stream, "[%s]\n", prepend_msg);
+              }
             }
           }
 #undef errloc_str
