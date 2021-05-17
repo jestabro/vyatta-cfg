@@ -186,13 +186,6 @@ clear_or_override_config_files ()
     done
 }
 
-update_interface_config ()
-{
-    if [ -d /run/udev/vyatta ]; then
-        $vyatta_sbindir/vyatta_interface_rescan /run/udev/vyatta $BOOTFILE
-    fi
-}
-
 cleanup_post_commit_hooks () {
     # Remove links from the post-commit hooks directory.
     # note that this approach only supports hooks that are "configured",
@@ -312,8 +305,6 @@ start ()
     run_preconfig_script
 
     run_postupgrade_script
-
-    update_interface_config
 
     for s in ${subinit[@]} ; do
     if ! disabled $s; then
