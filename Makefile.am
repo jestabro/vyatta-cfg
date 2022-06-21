@@ -127,7 +127,9 @@ install-exec-hook:
 	  $(LN_S) my_cli_bin my_comment; \
 	  $(LN_S) my_cli_bin my_discard; \
 	  $(LN_S) my_cli_bin my_move; \
-	  $(LN_S) my_cli_bin my_commit
+	  $(LN_S) my_cli_bin my_commit; \
+	  $(LN_S) my_cli_bin my_batch_set; \
+	  $(LN_S) my_cli_bin my_batch_delete
 	mkdir -p $(DESTDIR)/bin
 	cd $(DESTDIR)/bin ; \
 	  $(LN_S) $(sbindir)/my_cli_shell_api cli-shell-api

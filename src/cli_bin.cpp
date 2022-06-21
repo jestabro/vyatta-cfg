@@ -19,6 +19,9 @@
 #include <cstring>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <libgen.h>
 
 #include <cli_cstore.h>
@@ -220,6 +223,66 @@ OpFuncT OpFunc[] = {
   NULL
 };
 
+static int
+batch_set(Cstore& cstore, const std::vector<Cpath>& set_list)
+{
+  int error = 0;
+
+  for (size_t i = 0; i < set_list.size(); i++) {
+    if (!cstore.validateSetPath(set_list[i]) || !cstore.setCfgPath(set_list[i])) {
+      error = 1;
+      printf("Set '%s' failed\n", set_list[i].to_string().c_str());
+    }
+  }
+  return error;
+}
+
+static int
+batch_delete(Cstore& cstore, const std::vector<Cpath>& del_list)
+{
+  int error = 0;
+  for (size_t i = 0; i < del_list.size(); i++) {
+    if (!cstore.deleteCfgPath(del_list[i])) {
+      error = 1;
+      printf("Delete '%s' failed\n", del_list[i].to_string().c_str());
+    }
+  }
+  return error;
+}
+
+int process_batch_commands(const char *op_name, const char *file_name)
+{
+  int error = 0;
+  std::string cmd;
+  std::vector<Cpath> commands;
+  std::ifstream infile(file_name);
+
+  Cstore *cstore = Cstore::createCstore(false);
+
+  while (std::getline(infile, cmd)) {
+    Cpath path;
+    std::stringstream ss(cmd);
+    for (std::string s; ss >> std::quoted(s, '\'');) {
+      path.push(s);
+    }
+    commands.push_back(path);
+  }
+
+  if (strcmp(op_name, "my_batch_set") == 0)
+    error = batch_set(*cstore, commands);
+  if (strcmp(op_name, "my_batch_delete") == 0)
+    error = batch_delete(*cstore, commands);
+
+  delete cstore;
+
+  if (error) {
+    printf("Error in set/delete\n");
+    return 1;
+  }
+
+  return 0;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -232,8 +295,22 @@ main(int argc, char **argv)
     ++i;
   }
   if (op_idx == -1) {
-    printf("Invalid operation\n");
-    exit(1);
+    if ((strcmp(basename(argv[0]), "my_batch_set") != 0) &&
+        (strcmp(basename(argv[0]), "my_batch_delete") != 0)) {
+        printf("Invalid operation\n");
+        exit(1);
+    } else {
+      int res = 0;
+      if (argc < 2) {
+        printf("batch set/delete requires a file argument\n");
+        exit(1);
+      }
+      res = process_batch_commands(basename(argv[0]), argv[1]);
+      if (res)
+        exit(1);
+      else
+        exit(0);
+    }
   }
 
   if (initialize_output(OP_Str) == -1) {
