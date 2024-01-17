@@ -108,3 +108,26 @@ vy_set_path(void *handle, const char *path[], size_t len)
 out:
     return out_data;
 }
+
+out_data_t *
+vy_delete_path(void *handle, const char *path[], size_t len)
+{
+    Cstore *cstore = (Cstore *)handle;
+    Cpath path_comps = Cpath(path, len);
+    out_data_t *out_data;
+    int res;
+
+    cout_redirect redir = cout_redirect();
+
+    res = cstore->deleteCfgPath(path_comps);
+    if (!res) {
+        std::cout << "delete failed" << std::endl;
+        out_data = out_data_copy(redir.get_string());
+        goto out;
+    }
+    else
+        out_data = out_data_init();
+
+out:
+    return out_data;
+}
