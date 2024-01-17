@@ -56,6 +56,7 @@ src_libvyatta_cfg_la_SOURCES += src/cnode/cnode-algorithm.cpp
 src_libvyatta_cfg_la_SOURCES += src/cparse/cparse.cpp
 src_libvyatta_cfg_la_SOURCES += src/cparse/cparse_lex.c
 src_libvyatta_cfg_la_SOURCES += src/commit/commit-algorithm.cpp
+src_libvyatta_cfg_la_SOURCES += src/vy_adapter.cpp
 CLEANFILES = src/cli_parse.c src/cli_parse.h src/cli_def.c src/cli_val.c
 CLEANFILES += src/cparse/cparse.cpp src/cparse/cparse.h
 CLEANFILES += src/cparse/cparse_lex.c
@@ -65,6 +66,7 @@ LDADD += $(GOBJECT_LIBS)
 
 vincludedir = $(includedir)/vyatta-cfg
 vinclude_HEADERS = src/cli_cstore.h
+vinclude_HEADERS = src/vy_adapter.h
 
 vcincdir = $(vincludedir)/cstore
 vcinc_HEADERS = src/cstore/cstore-c.h
