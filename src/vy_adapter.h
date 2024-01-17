@@ -30,6 +30,7 @@ void out_data_free(out_data_t *);
 void *vy_cstore_init(void);
 void vy_cstore_free(void *handle);
 out_data_t *vy_set_path(void *, const char **, size_t);
+out_data_t *vy_delete_path(void *, const char **, size_t);
 
 #ifdef __cplusplus
 }
