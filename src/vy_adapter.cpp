@@ -66,15 +66,22 @@ void out_data_free(out_data_t *out_data)
 void *
 vy_cstore_init(void)
 {
-  Cstore *handle = Cstore::createCstore(false);
-  return (void *) handle;
+    Cstore *handle = Cstore::createCstore(false);
+    return (void *) handle;
 }
 
 void
 vy_cstore_free(void *handle)
 {
-  Cstore *h = (Cstore *) handle;
-  delete h;
+    Cstore *h = (Cstore *) handle;
+    delete h;
+}
+
+int
+vy_in_session(void *handle)
+{
+    Cstore *h = (Cstore *) handle;
+    return h->inSession() ? 1 : 0;
 }
 
 out_data_t *
