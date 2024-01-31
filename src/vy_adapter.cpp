@@ -35,7 +35,6 @@ struct cout_redirect {
         }
         ~cout_redirect( ) {
             std::cout.rdbuf( old ); // reverse redirect
-            std::cout << "cout_redirect destructor" << std::endl;
         }
     private:
         std::stringstream buffer;
@@ -59,7 +58,6 @@ out_data_t *out_data_copy(std::string msg)
 
 void out_data_free(out_data_t *out_data)
 {
-    std::cout << "free out_data" << std::endl;
     free(out_data);
 }
 
