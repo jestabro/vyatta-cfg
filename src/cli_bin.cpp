@@ -103,9 +103,11 @@ static void
 doSet(Cstore& cstore, const Cpath& path_comps)
 {
   if (!cstore.validateSetPath(path_comps)) {
+    OUTPUT_USER("JSE in doSet: Invalid set path\n");
     bye("invalid set path\n");
   }
   if (!cstore.setCfgPath(path_comps)) {
+    OUTPUT_USER("Set cfg path failed\n");
     bye("set cfg path failed\n");
   }
 }

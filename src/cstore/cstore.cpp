@@ -357,7 +357,10 @@ Cstore::validateSetPath(const Cpath& path_comps)
   // if we can get parsed tmpl, path is valid
   string terr;
   tr1::shared_ptr<Ctemplate> def(get_parsed_tmpl(path_comps, true, terr));
+  print_path_vec("JSE in validateSetPath with path [", "]\n", path_comps, "'");
+//  output_user("JSE output_user in validateSetPath\n");
   if (!def.get()) {
+    output_user("JSE get_parsed_tmpl fail in validateSetPath\n");
     output_user("%s\n", terr.c_str());
     return false;
   }
@@ -1972,7 +1975,9 @@ Cstore::loadFile(const char *filename)
     }
   }
   for (size_t i = 0; i < set_list.size(); i++) {
+    print_path_vec("JSE in loadFile, try set [", "]\n", set_list[i], "'");
     if (!validateSetPath(set_list[i]) || !setCfgPath(set_list[i])) {
+      output_user("JSE validateSetPath false in loadFile\n");
       print_path_vec("Set [", "] failed\n", set_list[i], "'");
     }
   }
