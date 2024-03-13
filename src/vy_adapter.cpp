@@ -41,13 +41,6 @@ struct cout_redirect {
         std::streambuf * old;
 };
 
-out_data_t *out_data_init()
-{
-    out_data_t *out_data = (out_data_t *) malloc(sizeof(out_data_t));
-    out_data->length = 0;
-    return out_data;
-}
-
 out_data_t *out_data_copy(std::string msg)
 {
     out_data_t *out_data = (out_data_t *) malloc(sizeof(out_data_t) + msg.length());
@@ -87,7 +80,7 @@ vy_set_path(void *handle, const char *path[], size_t len)
 {
     Cstore *cstore = (Cstore *)handle;
     Cpath path_comps = Cpath(path, len);
-    out_data_t *out_data;
+    out_data_t *out_data = NULL;
     int res;
 
     cout_redirect redir = cout_redirect();
@@ -98,8 +91,6 @@ vy_set_path(void *handle, const char *path[], size_t len)
         out_data = out_data_copy(redir.get_string());
         goto out;
     }
-    else
-        out_data = out_data_init();
 
     res = cstore->setCfgPath(path_comps);
     if (!res) {
@@ -107,8 +98,6 @@ vy_set_path(void *handle, const char *path[], size_t len)
         out_data = out_data_copy(redir.get_string());
         goto out;
     }
-    else
-        out_data = out_data_init();
 
 out:
     return out_data;
@@ -119,7 +108,7 @@ vy_delete_path(void *handle, const char *path[], size_t len)
 {
     Cstore *cstore = (Cstore *)handle;
     Cpath path_comps = Cpath(path, len);
-    out_data_t *out_data;
+    out_data_t *out_data = NULL;
     int res;
 
     cout_redirect redir = cout_redirect();
@@ -128,11 +117,7 @@ vy_delete_path(void *handle, const char *path[], size_t len)
     if (!res) {
         std::cout << "delete failed" << std::endl;
         out_data = out_data_copy(redir.get_string());
-        goto out;
     }
-    else
-        out_data = out_data_init();
 
-out:
     return out_data;
 }
