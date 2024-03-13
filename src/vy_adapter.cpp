@@ -79,23 +79,27 @@ out_data_t *
 vy_set_path(void *handle, const char *path[], size_t len)
 {
     Cstore *cstore = (Cstore *)handle;
+//    Cstore *cstore;
     Cpath path_comps = Cpath(path, len);
     out_data_t *out_data = NULL;
+    std::string out_str;
     int res;
 
-    cout_redirect redir = cout_redirect();
+//    cout_redirect redir = cout_redirect();
+//    cstore = (Cstore *)handle;
 
     res = cstore->validateSetPath(path_comps);
     if (!res) {
-        std::cout << "invalid set path" << std::endl;
-        out_data = out_data_copy(redir.get_string());
+        out_str = "invalid set path: " + path_comps.to_string();
+        out_data = out_data_copy(out_str);
         goto out;
     }
 
     res = cstore->setCfgPath(path_comps);
     if (!res) {
-        std::cout << "set config path failed" << std::endl;
-        out_data = out_data_copy(redir.get_string());
+//        std::cout << "set config path failed" << std::endl;
+        out_str = "set config path failed: " + path_comps.to_string();
+        out_data = out_data_copy(out_str);
         goto out;
     }
 
@@ -109,14 +113,16 @@ vy_delete_path(void *handle, const char *path[], size_t len)
     Cstore *cstore = (Cstore *)handle;
     Cpath path_comps = Cpath(path, len);
     out_data_t *out_data = NULL;
+    std::string out_str;
     int res;
 
-    cout_redirect redir = cout_redirect();
+//    cout_redirect redir = cout_redirect();
 
     res = cstore->deleteCfgPath(path_comps);
     if (!res) {
-        std::cout << "delete failed" << std::endl;
-        out_data = out_data_copy(redir.get_string());
+//        std::cout << "delete failed" << std::endl;
+        out_str = "delete failed: " + path_comps.to_string();
+        out_data = out_data_copy(out_str);
     }
 
     return out_data;
