@@ -25,22 +25,6 @@
 
 using namespace cstore;
 
-struct cout_redirect {
-    public:
-        cout_redirect() {
-            old = std::cout.rdbuf( buffer.rdbuf() ); // redirect cout to buffer stream
-        }
-        std::string get_string() {
-            return buffer.str(); // get string
-        }
-        ~cout_redirect( ) {
-            std::cout.rdbuf( old ); // reverse redirect
-        }
-    private:
-        std::stringstream buffer;
-        std::streambuf * old;
-};
-
 out_data_t *out_data_copy(std::string msg)
 {
     out_data_t *out_data = (out_data_t *) malloc(sizeof(out_data_t) + msg.length());
@@ -79,14 +63,10 @@ out_data_t *
 vy_set_path(void *handle, const char *path[], size_t len)
 {
     Cstore *cstore = (Cstore *)handle;
-//    Cstore *cstore;
     Cpath path_comps = Cpath(path, len);
     out_data_t *out_data = NULL;
     std::string out_str;
     int res;
-
-//    cout_redirect redir = cout_redirect();
-//    cstore = (Cstore *)handle;
 
     res = cstore->validateSetPath(path_comps);
     if (!res) {
@@ -97,7 +77,6 @@ vy_set_path(void *handle, const char *path[], size_t len)
 
     res = cstore->setCfgPath(path_comps);
     if (!res) {
-//        std::cout << "set config path failed" << std::endl;
         out_str = "set config path failed: " + path_comps.to_string();
         out_data = out_data_copy(out_str);
         goto out;
@@ -116,11 +95,8 @@ vy_delete_path(void *handle, const char *path[], size_t len)
     std::string out_str;
     int res;
 
-//    cout_redirect redir = cout_redirect();
-
     res = cstore->deleteCfgPath(path_comps);
     if (!res) {
-//        std::cout << "delete failed" << std::endl;
         out_str = "delete failed: " + path_comps.to_string();
         out_data = out_data_copy(out_str);
     }
