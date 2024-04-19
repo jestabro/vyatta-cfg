@@ -19,18 +19,18 @@
 extern "C" {
 #endif
 
-typedef struct out_data {
-    size_t length;
-    char data[0];
-} out_data_t;
-
-void out_data_free(out_data_t *);
+typedef enum {
+    VY_SUCCESS =   0,
+    VY_SET_INVAL = 1 << 0,
+    VY_CFG_INVAL = 1 << 1,
+    VY_DEL_INVAL = 1 << 2
+} VY_ERR;
 
 void *vy_cstore_init(void);
 void vy_cstore_free(void *);
 int vy_in_session(void *);
-out_data_t *vy_set_path(void *, const char **, size_t);
-out_data_t *vy_delete_path(void *, const char **, size_t);
+VY_ERR vy_set_path(void *, const char **, size_t);
+VY_ERR vy_delete_path(void *, const char **, size_t);
 
 #ifdef __cplusplus
 }

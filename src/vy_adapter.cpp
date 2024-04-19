@@ -25,19 +25,6 @@
 
 using namespace cstore;
 
-out_data_t *out_data_copy(std::string msg)
-{
-    out_data_t *out_data = (out_data_t *) malloc(sizeof(out_data_t) + msg.length());
-    out_data->length = msg.length();
-    msg.copy(out_data->data, out_data->length);
-    return out_data;
-}
-
-void out_data_free(out_data_t *out_data)
-{
-    free(out_data);
-}
-
 void *
 vy_cstore_init(void)
 {
@@ -59,47 +46,39 @@ vy_in_session(void *handle)
     return h->inSession() ? 1 : 0;
 }
 
-out_data_t *
+VY_ERR
 vy_set_path(void *handle, const char *path[], size_t len)
 {
     Cstore *cstore = (Cstore *)handle;
     Cpath path_comps = Cpath(path, len);
-    out_data_t *out_data = NULL;
     std::string out_str;
     int res;
 
     res = cstore->validateSetPath(path_comps);
     if (!res) {
-        out_str = "Invalid set path: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-        goto out;
+        return VY_SET_INVAL;
     }
 
     res = cstore->setCfgPath(path_comps);
     if (!res) {
-        out_str = "Set config path failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-        goto out;
+        return VY_CFG_INVAL;
     }
 
-out:
-    return out_data;
+    return VY_SUCCESS;
 }
 
-out_data_t *
+VY_ERR
 vy_delete_path(void *handle, const char *path[], size_t len)
 {
     Cstore *cstore = (Cstore *)handle;
     Cpath path_comps = Cpath(path, len);
-    out_data_t *out_data = NULL;
     std::string out_str;
     int res;
 
     res = cstore->deleteCfgPath(path_comps);
     if (!res) {
-        out_str = "Delete failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
+        return VY_DEL_INVAL;
     }
 
-    return out_data;
+    return VY_SUCCESS;
 }
