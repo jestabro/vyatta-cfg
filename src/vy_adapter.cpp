@@ -25,6 +25,28 @@
 
 using namespace cstore;
 
+class Vy_paths {
+    public:
+        Vy_paths() {
+            std::cout << "paths constructor called" << std::endl;
+        };
+        ~Vy_paths() {
+            std::cout << "paths destructor called" << std::endl;
+        };
+        void add_set_path(const char *path[], size_t len) {
+            Cpath path_comps = Cpath(path, len);
+            set_list.push_back(path_comps);
+        };
+        void add_del_path(const char *path[], size_t len) {
+            Cpath path_comps = Cpath(path, len);
+            del_list.push_back(path_comps);
+        };
+    private:
+        vector<Cpath> del_list;
+        vector<Cpath> set_list;
+        vector<Cpath> com_list;
+};
+
 out_data_t *out_data_copy(std::string msg)
 {
     out_data_t *out_data = (out_data_t *) malloc(sizeof(out_data_t) + msg.length());
@@ -52,11 +74,38 @@ vy_cstore_free(void *handle)
     delete h;
 }
 
+void *
+vy_cpaths_init(void)
+{
+    Vy_paths *paths = new Vy_paths;
+    return (void *) paths;
+}
+
+void vy_cpaths_free(void *p)
+{
+    Vy_paths *paths = (Vy_paths *) p;
+    delete paths;
+}
+
 int
 vy_in_session(void *handle)
 {
     Cstore *h = (Cstore *) handle;
     return h->inSession() ? 1 : 0;
+}
+
+void
+vy_add_set_path(void *handle, const char *path[], size_t len)
+{
+    Vy_paths *paths = (Vy_paths *)handle;
+    paths->add_set_path(path, len);
+}
+
+void
+vy_add_del_path(void *handle, const char *path[], size_t len)
+{
+    Vy_paths *paths = (Vy_paths *)handle;
+    paths->add_del_path(path, len);
 }
 
 out_data_t *
