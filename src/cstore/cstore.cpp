@@ -1989,6 +1989,25 @@ Cstore::loadFile(const char *filename)
   return true;
 }
 
+// load from paths
+bool
+Cstore::load_paths(vector<Cpath> del_list, vector<Cpath> set_list, string& out)
+{
+  // "apply" the changes to the working config
+  for (size_t i = 0; i < del_list.size(); i++) {
+    if (!deleteCfgPath(del_list[i])) {
+      out = out + "Delete failed: " + del_list[i].to_string() + "\n";
+    }
+  }
+  for (size_t i = 0; i < set_list.size(); i++) {
+    if (!validateSetPath(set_list[i]) || !setCfgPath(set_list[i])) {
+      out = out + "Set failed: " + set_list[i].to_string() + "\n";
+    }
+  }
+
+  return true;
+}
+
 /* "changed" status handling.
  * the "changed" status is used during commit to check if a node has been
  * changed. note that if a node is "changed", all of its ancestors are also

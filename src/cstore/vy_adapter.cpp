@@ -119,13 +119,43 @@ vy_add_del_path(void *handle, const char *path[], size_t len)
 out_data_t *
 vy_load_paths(void *cstore_handle, void *cpaths_handle)
 {
-//    Cstore& cstore = *(Cstore *)cstore_handle;
     Cstore *cstore_ptr = Cstore::createCstore(false);
     Cstore& cstore = *cstore_ptr;
 
     Vy_paths *paths = (Vy_paths *)cpaths_handle;
-//    vector<Cpath>& del_list = paths->get_del_list();
-//    vector<Cpath>& set_list = paths->get_set_list();
+    out_data_t *out_data = NULL;
+    std::string out_str = "";
+    time_point<high_resolution_clock> start_time;
+    time_point<high_resolution_clock> stop_time;
+    int total_ms;
+    int sec_elapsed;
+    int ms_elapsed;
+    cout << "begin copy" << endl;
+    vector<Cpath> del_list = paths->del_list;
+    vector<Cpath> set_list = paths->set_list;
+    cout << "end copy" << endl;;
+
+    start_time = high_resolution_clock::now();
+
+    cstore.load_paths(del_list, set_list, out_str);
+
+    stop_time = high_resolution_clock::now();
+    total_ms = duration_cast<milliseconds>(stop_time - start_time).count();
+    sec_elapsed = total_ms / 1000;
+    ms_elapsed = total_ms % 1000;
+    cout << "load_paths time: sec: " << sec_elapsed << " ms: " << ms_elapsed << endl;
+
+    out_data = out_data_copy(out_str);
+    return out_data;
+}
+/*
+out_data_t *
+vy_load_paths_prev(void *cstore_handle, void *cpaths_handle)
+{
+    Cstore *cstore_ptr = Cstore::createCstore(false);
+    Cstore& cstore = *cstore_ptr;
+
+    Vy_paths *paths = (Vy_paths *)cpaths_handle;
     out_data_t *out_data = NULL;
     std::string out_str = "";
     time_point<high_resolution_clock> start_time;
@@ -174,3 +204,4 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
     out_data = out_data_copy(out_str);
     return out_data;
 }
+*/
