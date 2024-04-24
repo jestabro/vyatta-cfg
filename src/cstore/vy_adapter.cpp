@@ -19,11 +19,13 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <chrono>
 
 #include <cstore/cstore.hpp>
 #include <vy_adapter.h>
 
 using namespace cstore;
+using namespace chrono;
 
 class Vy_paths {
     public:
@@ -127,10 +129,17 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
     out_data_t *out_data = NULL;
     std::string out_str = "";
     int res;
+    time_point<high_resolution_clock> start_time;
+    time_point<high_resolution_clock> stop_time;
+    int total_ms;
+    int sec_elapsed;
+    int ms_elapsed;
     cout << "begin copy" << endl;
     vector<Cpath> del_list = paths->del_list;
     vector<Cpath> set_list = paths->set_list;
     cout << "end copy" << endl;;
+
+    start_time = high_resolution_clock::now();
 
     for (size_t i = 0; i < del_list.size(); i++) {
         res = cstore.deleteCfgPath(del_list[i]);
@@ -138,6 +147,14 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
             out_str = out_str + "Delete failed: " + del_list[i].to_string() + "\n";
         }
     }
+
+    stop_time = high_resolution_clock::now();
+    total_ms = duration_cast<milliseconds>(stop_time - start_time).count();
+    sec_elapsed = total_ms / 1000;
+    ms_elapsed = total_ms % 1000;
+    cout << "delete time: sec: " << sec_elapsed << " ms: " << ms_elapsed << endl;
+
+    start_time = high_resolution_clock::now();
 
     for (size_t i = 0; i < set_list.size(); i++) {
         res = cstore.validateSetPath(set_list[i]);
@@ -151,6 +168,12 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
             out_str = out_str + "Set config path failed: " + set_list[i].to_string() + "\n";
         }
     }
+
+    stop_time = high_resolution_clock::now();
+    total_ms = duration_cast<milliseconds>(stop_time - start_time).count();
+    sec_elapsed = total_ms / 1000;
+    ms_elapsed = total_ms % 1000;
+    cout << "set time: sec: " << sec_elapsed << " ms: " << ms_elapsed << endl;
 
     out_data = out_data_copy(out_str);
     return out_data;
