@@ -358,7 +358,7 @@ Cstore::validateSetPath(const Cpath& path_comps)
   string terr;
   tr1::shared_ptr<Ctemplate> def(get_parsed_tmpl(path_comps, true, terr));
   if (!def.get()) {
-    output_user("%s\n", terr.c_str());
+//    output_user("%s\n", terr.c_str());
     return false;
   }
 
@@ -379,8 +379,8 @@ Cstore::validateSetPath(const Cpath& path_comps)
        *       single-value node without value. now all value nodes
        *       (single-value, multi-value, and tag) must be set with value.
        */
-      string output = "Configuration path: ["+path_comps.to_string()+"] requires a value\n";
-      output_user(output.c_str());
+//      string output = "Configuration path: ["+path_comps.to_string()+"] requires a value\n";
+//      output_user(output.c_str());
       return false;
     } else {
       /* typeless node
