@@ -41,6 +41,12 @@ class Vy_paths {
             Cpath path_comps = Cpath(path, len);
             del_list.push_back(path_comps);
         };
+        vector<Cpath>& get_set_list() {
+            return set_list;
+        };
+        vector<Cpath>& get_del_list() {
+            return del_list;
+        };
     private:
         vector<Cpath> del_list;
         vector<Cpath> set_list;
@@ -109,46 +115,36 @@ vy_add_del_path(void *handle, const char *path[], size_t len)
 }
 
 out_data_t *
-vy_set_path(void *handle, const char *path[], size_t len)
+vy_load_paths(void *cstore_handle, void *cpaths_handle)
 {
-    Cstore *cstore = (Cstore *)handle;
-    Cpath path_comps = Cpath(path, len);
+    Cstore *cstore = (Cstore *)cstore_handle;
+    Vy_paths *paths = (Vy_paths *)cpaths_handle;
+    vector<Cpath>& del_list = paths->get_del_list();
+    vector<Cpath>& set_list = paths->get_set_list();
     out_data_t *out_data = NULL;
-    std::string out_str;
+    std::string out_str = "";
     int res;
 
-    res = cstore->validateSetPath(path_comps);
-    if (!res) {
-        out_str = "Invalid set path: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-        goto out;
+    for (size_t i = 0; i < del_list.size(); i++) {
+        res = cstore->deleteCfgPath(del_list[i]);
+        if (!res) {
+            out_str = out_str + "Delete failed: " + del_list[i].to_string() + "\n";
+        }
     }
 
-    res = cstore->setCfgPath(path_comps);
-    if (!res) {
-        out_str = "Set config path failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-        goto out;
+    for (size_t i = 0; i < set_list.size(); i++) {
+        res = cstore->validateSetPath(set_list[i]);
+        if (!res) {
+            out_str = out_str + "Invalid set path: " + set_list[i].to_string() + "\n";
+            continue;
+        }
+
+        res = cstore->setCfgPath(set_list[i]);
+        if (!res) {
+            out_str = out_str + "Set config path failed: " + set_list[i].to_string() + "\n";
+        }
     }
 
-out:
-    return out_data;
-}
-
-out_data_t *
-vy_delete_path(void *handle, const char *path[], size_t len)
-{
-    Cstore *cstore = (Cstore *)handle;
-    Cpath path_comps = Cpath(path, len);
-    out_data_t *out_data = NULL;
-    std::string out_str;
-    int res;
-
-    res = cstore->deleteCfgPath(path_comps);
-    if (!res) {
-        out_str = "Delete failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-    }
-
+    out_data = out_data_copy(out_str);
     return out_data;
 }

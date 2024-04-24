@@ -19,8 +19,6 @@
 extern "C" {
 #endif
 
-typedef struct paths paths_t;
-
 typedef struct out_data {
     size_t length;
     char data[0];
@@ -35,8 +33,9 @@ void vy_cpaths_free(void *);
 int vy_in_session(void *);
 void vy_add_set_path(void *, const char **, size_t);
 void vy_add_del_path(void *, const char **, size_t);
-out_data_t *vy_set_path(void *, const char **, size_t);
-out_data_t *vy_delete_path(void *, const char **, size_t);
+out_data_t *vy_load_paths(void *, void *);
+//out_data_t *vy_set_path(void *, const char **, size_t);
+//out_data_t *vy_delete_path(void *, const char **, size_t);
 
 #ifdef __cplusplus
 }
