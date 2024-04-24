@@ -128,7 +128,6 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
 //    vector<Cpath>& set_list = paths->get_set_list();
     out_data_t *out_data = NULL;
     std::string out_str = "";
-    int res;
     time_point<high_resolution_clock> start_time;
     time_point<high_resolution_clock> stop_time;
     int total_ms;
@@ -142,8 +141,7 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
     start_time = high_resolution_clock::now();
 
     for (size_t i = 0; i < del_list.size(); i++) {
-        res = cstore.deleteCfgPath(del_list[i]);
-        if (!res) {
+        if (!cstore.deleteCfgPath(del_list[i])) {
             out_str = out_str + "Delete failed: " + del_list[i].to_string() + "\n";
         }
     }
@@ -157,14 +155,12 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
     start_time = high_resolution_clock::now();
 
     for (size_t i = 0; i < set_list.size(); i++) {
-        res = cstore.validateSetPath(set_list[i]);
-        if (!res) {
+        if (!cstore.validateSetPath(set_list[i])) {
             out_str = out_str + "Invalid set path: " + set_list[i].to_string() + "\n";
             continue;
         }
 
-        res = cstore.setCfgPath(set_list[i]);
-        if (!res) {
+        if (!cstore.setCfgPath(set_list[i])) {
             out_str = out_str + "Set config path failed: " + set_list[i].to_string() + "\n";
         }
     }
