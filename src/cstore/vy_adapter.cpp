@@ -47,7 +47,7 @@ class Vy_paths {
         vector<Cpath>& get_del_list() {
             return del_list;
         };
-    private:
+//    private:
         vector<Cpath> del_list;
         vector<Cpath> set_list;
         vector<Cpath> com_list;
@@ -117,13 +117,20 @@ vy_add_del_path(void *handle, const char *path[], size_t len)
 out_data_t *
 vy_load_paths(void *cstore_handle, void *cpaths_handle)
 {
-    Cstore& cstore = *(Cstore *)cstore_handle;
+//    Cstore& cstore = *(Cstore *)cstore_handle;
+    Cstore *cstore_ptr = Cstore::createCstore(false);
+    Cstore& cstore = *cstore_ptr;
+
     Vy_paths *paths = (Vy_paths *)cpaths_handle;
-    vector<Cpath>& del_list = paths->get_del_list();
-    vector<Cpath>& set_list = paths->get_set_list();
+//    vector<Cpath>& del_list = paths->get_del_list();
+//    vector<Cpath>& set_list = paths->get_set_list();
     out_data_t *out_data = NULL;
     std::string out_str = "";
     int res;
+    cout << "begin copy" << endl;
+    vector<Cpath> del_list = paths->del_list;
+    vector<Cpath> set_list = paths->set_list;
+    cout << "end copy" << endl;;
 
     for (size_t i = 0; i < del_list.size(); i++) {
         res = cstore.deleteCfgPath(del_list[i]);
