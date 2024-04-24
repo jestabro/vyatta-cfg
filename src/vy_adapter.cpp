@@ -117,7 +117,7 @@ vy_add_del_path(void *handle, const char *path[], size_t len)
 out_data_t *
 vy_load_paths(void *cstore_handle, void *cpaths_handle)
 {
-    Cstore *cstore = (Cstore *)cstore_handle;
+    Cstore& cstore = *(Cstore *)cstore_handle;
     Vy_paths *paths = (Vy_paths *)cpaths_handle;
     vector<Cpath>& del_list = paths->get_del_list();
     vector<Cpath>& set_list = paths->get_set_list();
@@ -126,20 +126,20 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
     int res;
 
     for (size_t i = 0; i < del_list.size(); i++) {
-        res = cstore->deleteCfgPath(del_list[i]);
+        res = cstore.deleteCfgPath(del_list[i]);
         if (!res) {
             out_str = out_str + "Delete failed: " + del_list[i].to_string() + "\n";
         }
     }
 
     for (size_t i = 0; i < set_list.size(); i++) {
-        res = cstore->validateSetPath(set_list[i]);
+        res = cstore.validateSetPath(set_list[i]);
         if (!res) {
             out_str = out_str + "Invalid set path: " + set_list[i].to_string() + "\n";
             continue;
         }
 
-        res = cstore->setCfgPath(set_list[i]);
+        res = cstore.setCfgPath(set_list[i]);
         if (!res) {
             out_str = out_str + "Set config path failed: " + set_list[i].to_string() + "\n";
         }
