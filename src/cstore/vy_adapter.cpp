@@ -130,6 +130,7 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
     int total_ms;
     int sec_elapsed;
     int ms_elapsed;
+    const char *filename = "config.test";
     cout << "begin copy" << endl;
     vector<Cpath> del_list = paths->del_list;
     vector<Cpath> set_list = paths->set_list;
@@ -137,7 +138,8 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
 
     start_time = high_resolution_clock::now();
 
-    cstore.load_paths(del_list, set_list, out_str);
+//    cstore.load_paths(del_list, set_list, out_str);
+    cstore.loadFile(filename);
 
     stop_time = high_resolution_clock::now();
     total_ms = duration_cast<milliseconds>(stop_time - start_time).count();
