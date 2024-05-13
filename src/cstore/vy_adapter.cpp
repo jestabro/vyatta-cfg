@@ -37,6 +37,7 @@ class Vy_paths {
         };
         void add_set_path(const char *path[], size_t len) {
             Cpath path_comps = Cpath(path, len);
+            cout << "add_set_path: " << path_comps.to_string() << endl;
             set_list.push_back(path_comps);
         };
         void add_del_path(const char *path[], size_t len) {

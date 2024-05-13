@@ -1971,6 +1971,7 @@ Cstore::loadFile(const char *filename)
       print_path_vec("Delete [", "] failed\n", del_list[i], "'");
     }
   }
+  cout << "set_list.size(): " << set_list.size() << endl;
   for (size_t i = 0; i < set_list.size(); i++) {
     if (!validateSetPath(set_list[i]) || !setCfgPath(set_list[i])) {
       print_path_vec("Set [", "] failed\n", set_list[i], "'");
@@ -2001,6 +2002,7 @@ Cstore::load_paths(vector<Cpath> del_list, vector<Cpath> set_list, string& out)
       out = out + "Delete failed: " + del_list[i].to_string() + "\n";
     }
   }
+  cout << "set_list.size(): " << set_list.size() << endl;
   for (size_t i = 0; i < set_list.size(); i++) {
     if (!validateSetPath(set_list[i]) || !setCfgPath(set_list[i])) {
 //      cout << "set failed" << endl;
