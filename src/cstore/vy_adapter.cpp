@@ -117,7 +117,7 @@ vy_add_del_path(void *handle, const char *path[], size_t len)
 }
 
 out_data_t *
-vy_load_paths(void *cstore_handle, void *cpaths_handle)
+vy_load_paths(void *cstore_handle, void *cpaths_handle, int legacy)
 {
     Cstore *cstore_ptr = Cstore::createCstore(false);
     Cstore& cstore = *cstore_ptr;
@@ -138,8 +138,12 @@ vy_load_paths(void *cstore_handle, void *cpaths_handle)
 
     start_time = high_resolution_clock::now();
 
-//    cstore.load_paths(del_list, set_list, out_str);
-    cstore.loadFile(filename);
+    if (!legacy) {
+        cstore.load_paths(del_list, set_list, out_str);
+    }
+    else {
+        cstore.loadFile(filename);
+    }
 
     stop_time = high_resolution_clock::now();
     total_ms = duration_cast<milliseconds>(stop_time - start_time).count();

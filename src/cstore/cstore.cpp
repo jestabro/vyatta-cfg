@@ -1993,14 +1993,17 @@ Cstore::loadFile(const char *filename)
 bool
 Cstore::load_paths(vector<Cpath> del_list, vector<Cpath> set_list, string& out)
 {
+  cout << "test begin" << endl;
   // "apply" the changes to the working config
   for (size_t i = 0; i < del_list.size(); i++) {
     if (!deleteCfgPath(del_list[i])) {
+//      cout << "delete failed" << endl;
       out = out + "Delete failed: " + del_list[i].to_string() + "\n";
     }
   }
   for (size_t i = 0; i < set_list.size(); i++) {
     if (!validateSetPath(set_list[i]) || !setCfgPath(set_list[i])) {
+//      cout << "set failed" << endl;
       out = out + "Set failed: " + set_list[i].to_string() + "\n";
     }
   }
@@ -2589,6 +2592,7 @@ Cstore::set_cfg_path(const Cpath& path_comps, bool output)
 
     // nop if this level already in working (including deactivated)
     if (cfg_path_exists(ppath, false, true)) {
+//      output_user("JSE path exists\n");
       continue;
     }
 
