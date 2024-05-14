@@ -1992,7 +1992,7 @@ Cstore::loadFile(const char *filename)
 
 // load from paths
 bool
-Cstore::load_paths(vector<Cpath> del_list, vector<Cpath> set_list, string& out)
+Cstore::load_paths(vector<Cpath>& del_list, vector<Cpath>& set_list, string& out)
 {
   cout << "test begin" << endl;
   // "apply" the changes to the working config

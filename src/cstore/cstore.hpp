@@ -184,7 +184,7 @@ public:
      */
   // load
   bool loadFile(const char *filename);
-  bool load_paths(vector<Cpath> del_list, vector<Cpath> set_list, string& out);
+  bool load_paths(vector<Cpath>& del_list, vector<Cpath>& set_list, string& out);
 
   /******
    * these functions are observers of the current "working config" or
