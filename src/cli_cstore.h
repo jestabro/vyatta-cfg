@@ -144,6 +144,9 @@ char *get_at_string(void);
 void set_in_commit(boolean b);
 void set_if_last(int);
 void clear_last(void);
+FILE *jse_open_debug(void);
+void jse_write_debug(FILE *, const char *);
+void jse_close_debug(FILE *);
 void set_at_string(char* s);
 void set_in_delete_action(boolean b);
 

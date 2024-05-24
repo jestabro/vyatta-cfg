@@ -1900,6 +1900,9 @@ boolean validate_value(const vtw_def *def, char *cp)
     }
   }
 
+  OUTPUT_USER("JSE top of validate_value\n");
+
+
   /* prepare cur_value */
   set_at_string(cp);
   status = char2val(def, cp, &validate_value_val);
@@ -1920,7 +1923,13 @@ boolean validate_value(const vtw_def *def, char *cp)
     goto  validate_value_free_and_return;
   }
   ret = TRUE;
+  if (def->actions) {
+      OUTPUT_USER("JSE def->actions\n");
+  } else {
+      OUTPUT_USER("JSE no def->actions\n");
+  }
   if (def->actions  && def->actions[syntax_act].vtw_list_head){
+    OUTPUT_USER("JSE within validate_value, with def-actions[syntax_act]\n");
     in_validate_val = TRUE;
     ret = check_syn(def->actions[syntax_act].vtw_list_head,(const char *)NULL,FALSE);
     in_validate_val = FALSE;

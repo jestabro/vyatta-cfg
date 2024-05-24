@@ -35,6 +35,7 @@ static first_seg f_seg_m;
 static char *in_commit_file = "/var/tmp/in_commit";
 static char *initial_file = "/var/tmp/initial_in_commit";
 static char *last_in_queue_file = "/var/tmp/last_in_queue";
+static char *jse_debug_file = "/var/tmp/jse_debug";
 
 static int mark_by_file(char *p) {
     int ret = mknod(p, S_IFREG|0664, 0);
@@ -105,6 +106,20 @@ void set_if_last(int n) {
 
 void clear_last(void) {
   remove_mark(last_in_queue_file);
+}
+
+FILE *jse_open_debug(void) {
+    FILE *fp;
+    fp = fopen(jse_debug_file, "w");
+    return fp;
+}
+
+void jse_write_debug(FILE *fptr, const char *msg) {
+    fputs(msg, fptr);
+}
+
+void jse_close_debug(FILE *fptr) {
+    fclose(fptr);
 }
 
 boolean is_in_exec(void) {

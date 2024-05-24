@@ -2233,6 +2233,7 @@ Cstore::get_parsed_tmpl(const Cpath& path_comps, bool validate_vals,
   tr1::shared_ptr<Ctemplate> rtmpl;
   // default error message
   error = "Configuration path: ["+path_comps.to_string()+"] is not valid\n";
+  FILE *jse_fp = jse_open_debug();
 
   bool do_caching = false;
   if (tmpl_path_at_root()) {
@@ -2345,12 +2346,17 @@ Cstore::get_parsed_tmpl(const Cpath& path_comps, bool validate_vals,
      */
     if (pcomps->size() > 1) {
       tr1::shared_ptr<Ctemplate> ttmpl(tmpl_parse());
+// this causes error due to output (?!):
+//      output_user("JSE calling validate_vals for value in get_parsed_tmpl\n");
       if (ttmpl.get()) {
         if (ttmpl->isTag() || ttmpl->isMulti() || !ttmpl->isTypeless()) {
           // case (2). last component is "value".
+          jse_write_debug(jse_fp, "in case 2 (tag|multi|typeless)\n");
           if (validate_vals) {
             // validate value
+            jse_write_debug(jse_fp, "validate_vals\n");
             if (!validate_val(ttmpl, (*pcomps)[pcomps->size() - 1])) {
+              jse_write_debug(jse_fp, "invalid value");
               // invalid value
               error = "Value validation failed";
               break;
@@ -2382,6 +2388,7 @@ Cstore::get_parsed_tmpl(const Cpath& path_comps, bool validate_vals,
     }
     // case (3) (fall through)
   } while (0);
+  jse_close_debug(jse_fp);
 
   if (do_caching && rtmpl.get()) {
     // only cache if we got a valid template
@@ -2898,7 +2905,9 @@ Cstore::cfg_value_exists(const string& value, bool active_cfg)
 bool
 Cstore::validate_val(const tr1::shared_ptr<Ctemplate>& def, const char *value)
 {
+  output_user("JSE in validate_val\n");
   if (!def.get()) {
+    output_user("JSE before exit_internal in validate_val\n");
     exit_internal("validate_val: no tmpl [%s]\n", tmpl_path_to_str().c_str());
   }
 
