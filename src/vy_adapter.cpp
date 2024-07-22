@@ -19,87 +19,84 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <stdint.h>
+#include <assert.h>
 
 #include <cstore/cstore.hpp>
 #include <vy_adapter.h>
 
 using namespace cstore;
 
-out_data_t *out_data_copy(std::string msg)
+static uint64_t uint_of_voidptr(void* p)
 {
-    out_data_t *out_data = (out_data_t *) malloc(sizeof(out_data_t) + msg.length());
-    out_data->length = msg.length();
-    msg.copy(out_data->data, out_data->length);
-    return out_data;
+  assert (((uintptr_t) p & 1) == 0);
+  return (uint64_t) p | 1;
 }
 
-void out_data_free(out_data_t *out_data)
+static void *voidptr_of_uint(uint64_t v)
 {
-    free(out_data);
+  return (void *)(uintptr_t)(v & ~1);
 }
 
-void *
+static Cstore *cstore_of_handle(uint64_t handle)
+{
+    return (Cstore *) voidptr_of_uint(handle);
+}
+
+uint64_t
 vy_cstore_init(void)
 {
     Cstore *handle = Cstore::createCstore(false);
-    return (void *) handle;
+    return uint_of_voidptr(handle);
 }
 
 void
-vy_cstore_free(void *handle)
+vy_cstore_free(uint64_t handle)
 {
-    Cstore *h = (Cstore *) handle;
+    Cstore *h = cstore_of_handle(handle);
     delete h;
 }
 
 int
-vy_in_session(void *handle)
+vy_in_session(uint64_t handle)
 {
-    Cstore *h = (Cstore *) handle;
+    Cstore *h = cstore_of_handle(handle);
     return h->inSession() ? 1 : 0;
 }
 
-out_data_t *
-vy_set_path(void *handle, const char *path[], size_t len)
+int
+vy_set_path(uint64_t handle, const void** path_ptr, size_t len)
 {
-    Cstore *cstore = (Cstore *)handle;
+    Cstore *cstore = cstore_of_handle(handle);
+    const char **path = (const char **) path_ptr;
     Cpath path_comps = Cpath(path, len);
-    out_data_t *out_data = NULL;
-    std::string out_str;
     int res;
 
     res = cstore->validateSetPath(path_comps);
     if (!res) {
-        out_str = "Invalid set path: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-        goto out;
+        return 1;
     }
 
     res = cstore->setCfgPath(path_comps);
     if (!res) {
-        out_str = "Set config path failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-        goto out;
+        return 2;
     }
 
-out:
-    return out_data;
+    return 0;
 }
 
-out_data_t *
-vy_delete_path(void *handle, const char *path[], size_t len)
+int
+vy_delete_path(uint64_t handle, const void** path_ptr, size_t len)
 {
-    Cstore *cstore = (Cstore *)handle;
+    Cstore *cstore = cstore_of_handle(handle);
+    const char **path = (const char **) path_ptr;
     Cpath path_comps = Cpath(path, len);
-    out_data_t *out_data = NULL;
-    std::string out_str;
     int res;
 
     res = cstore->deleteCfgPath(path_comps);
     if (!res) {
-        out_str = "Delete failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
+        return 1;
     }
 
-    return out_data;
+    return 0;
 }
