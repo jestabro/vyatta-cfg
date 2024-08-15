@@ -19,11 +19,63 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <cstore/cstore.hpp>
 #include <vy_adapter.h>
 
 using namespace cstore;
+
+enum PIPES { READ, WRITE };
+
+class stdout_redirect {
+    public:
+        stdout_redirect(): old_stdout(0), redirecting(false) {
+            out_pipe[READ] = 0;
+            out_pipe[WRITE] = 0;
+            if (pipe(out_pipe) == -1) {
+                return;
+            }
+
+            old_stdout = dup(fileno(stdout));
+            setbuf(stdout, NULL);
+            dup2(out_pipe[WRITE], fileno(stdout));
+            dup2(out_pipe[WRITE], fileno(stderr));
+            redirecting = true;
+        }
+
+        std::string get_redirected_output() {
+            if (!redirecting) {
+                return "";
+            }
+
+            char buffer[1024];
+            ssize_t bytesRead = 0;
+            std::string redirected_output = "";
+            fcntl(out_pipe[READ], F_SETFL, O_NONBLOCK);
+            while ((bytesRead = read(out_pipe[READ], buffer, sizeof(buffer))) > 0) {
+                redirected_output.append(buffer, bytesRead);
+            }
+
+            return redirected_output;
+        }
+
+        ~stdout_redirect() {
+            if (!redirecting) {
+                return;
+            }
+
+            dup2(old_stdout, fileno(stdout));
+            close(out_pipe[READ]);
+            close(out_pipe[WRITE]);
+        }
+
+    private:
+        int out_pipe[2];
+        int old_stdout;
+        bool redirecting;
+};
 
 out_data_t *out_data_copy(std::string msg)
 {
@@ -65,21 +117,19 @@ vy_set_path(void *handle, const char *path[], size_t len)
     Cstore *cstore = (Cstore *)handle;
     Cpath path_comps = Cpath(path, len);
     out_data_t *out_data = NULL;
-    std::string out_str;
     int res;
+
+    stdout_redirect redirect = stdout_redirect();
 
     res = cstore->validateSetPath(path_comps);
     if (!res) {
-        out_str = "Invalid set path: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
+        out_data_copy(redirect.get_redirected_output());
         goto out;
     }
 
     res = cstore->setCfgPath(path_comps);
     if (!res) {
-        out_str = "Set config path failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
-        goto out;
+        out_data_copy(redirect.get_redirected_output());
     }
 
 out:
@@ -92,13 +142,13 @@ vy_delete_path(void *handle, const char *path[], size_t len)
     Cstore *cstore = (Cstore *)handle;
     Cpath path_comps = Cpath(path, len);
     out_data_t *out_data = NULL;
-    std::string out_str;
     int res;
+
+    stdout_redirect redirect = stdout_redirect();
 
     res = cstore->deleteCfgPath(path_comps);
     if (!res) {
-        out_str = "Delete failed: " + path_comps.to_string() + "\n";
-        out_data = out_data_copy(out_str);
+        out_data_copy(redirect.get_redirected_output());
     }
 
     return out_data;
