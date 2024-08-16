@@ -135,6 +135,10 @@ vy_set_path(void *handle, const char *path[], size_t len)
     out_data_t *out_data = NULL;
     int res;
 
+    if (initialize_output("Set") == -1) {
+        printf("can't initialize output\n");
+    }
+
     stdout_redirect redirect = stdout_redirect();
 
     res = cstore->validateSetPath(path_comps);
