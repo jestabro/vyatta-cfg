@@ -58,6 +58,7 @@ class stdout_redirect {
                 redirected_output.append(buffer, bytesRead);
             }
 
+            std::cout << "JSE redirected_output: " << redirected_output << std::endl;
             return redirected_output;
         }
 
@@ -123,13 +124,19 @@ vy_set_path(void *handle, const char *path[], size_t len)
 
     res = cstore->validateSetPath(path_comps);
     if (!res) {
-        out_data_copy(redirect.get_redirected_output());
+        out_data = out_data_copy(redirect.get_redirected_output());
         goto out;
+    }
+    else {
+        out_data = out_data_copy("OK");
     }
 
     res = cstore->setCfgPath(path_comps);
     if (!res) {
-        out_data_copy(redirect.get_redirected_output());
+        out_data = out_data_copy(redirect.get_redirected_output());
+    }
+    else {
+        out_data = out_data_copy("OK");
     }
 
 out:
