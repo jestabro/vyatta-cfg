@@ -39,7 +39,9 @@ class stdout_redirect {
             }
 
             old_stdout = dup(fileno(stdout));
+            old_stderr = dup(fileno(stderr));
             setbuf(stdout, NULL);
+            setbuf(stderr, NULL);
             dup2(out_pipe[WRITE], fileno(stdout));
             dup2(out_pipe[WRITE], fileno(stderr));
             redirecting = true;
@@ -68,13 +70,26 @@ class stdout_redirect {
             }
 
             dup2(old_stdout, fileno(stdout));
-            close(out_pipe[READ]);
-            close(out_pipe[WRITE]);
+            dup2(old_stderr, fileno(stderr));
+
+            if (old_stdout > 0) {
+                close(old_stdout);
+            }
+            if (old_stderr > 0) {
+                close(old_stderr);
+            }
+            if (out_pipe[READ] > 0) {
+                close(out_pipe[READ]);
+            }
+            if (out_pipe[WRITE] > 0) {
+                close(out_pipe[WRITE]);
+            }
         }
 
     private:
         int out_pipe[2];
         int old_stdout;
+        int old_stderr;
         bool redirecting;
 };
 
