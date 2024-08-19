@@ -50,18 +50,18 @@ class stdout_redirect {
 
         std::string get_redirected_output() {
             if (!redirecting) {
-                return "";
+                return "NONE\n";
             }
 
             char buffer[1024];
             ssize_t bytesRead = 0;
-            std::string redirected_output = "";
+            std::string redirected_output = "BEGIN:\n";
             fcntl(out_pipe[READ], F_SETFL, O_NONBLOCK);
             while ((bytesRead = read(out_pipe[READ], buffer, sizeof(buffer))) > 0) {
                 redirected_output.append(buffer, bytesRead);
             }
+            redirected_output.append("END\n");
 
-            std::cout << "JSE redirected_output: " << redirected_output << std::endl;
             return redirected_output;
         }
 
