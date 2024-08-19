@@ -144,7 +144,8 @@ vy_set_path(void *handle, const char *path[], size_t len)
 
     res = cstore->validateSetPath(path_comps);
     if (!res) {
-        out_data = out_data_copy(redirect.get_redirected_output());
+//        out_data = out_data_copy(redirect.get_redirected_output());
+        out_data = out_data_copy("WTF\n");
         goto out;
     }
     else {
