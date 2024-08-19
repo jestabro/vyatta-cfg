@@ -35,6 +35,7 @@ class stdout_redirect {
             out_pipe[READ] = 0;
             out_pipe[WRITE] = 0;
             if (pipe(out_pipe) == -1) {
+                printf("pipe failed\n");
                 return;
             }
 
