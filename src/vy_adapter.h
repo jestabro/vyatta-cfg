@@ -22,8 +22,8 @@ extern "C" {
 uint64_t vy_cstore_init(void);
 void vy_cstore_free(uint64_t);
 int vy_in_session(uint64_t);
-int vy_set_path(uint64_t, const void **, size_t);
-int vy_delete_path(uint64_t, const void **, size_t);
+const char *vy_set_path(uint64_t, const void **, size_t);
+const char *vy_delete_path(uint64_t, const void **, size_t);
 
 #ifdef __cplusplus
 }
