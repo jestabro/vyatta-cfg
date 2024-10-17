@@ -21,6 +21,8 @@
 #include <iostream>
 #include <cstdint>
 #include <cassert>
+#include <algorithm>
+#include <list>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -89,10 +91,22 @@ class stdout_redirect {
         bool redirecting;
 };
 
-const char *out_data_copy(std::string msg)
+struct cstore_obj {
+    Cstore *cstore;
+    std::list<char *> output;
+};
+
+static struct cstore_obj* create_handle() {
+    struct cstore_obj *h  = new cstore_obj;
+    h->cstore = Cstore::createCstore(false);
+    return h;
+};
+
+const char *out_data_copy(std::string msg, cstore_obj *o)
 {
     size_t len = msg.length();
     char *out_data = (char *) malloc(len + 1);
+    o->output.push_back(out_data);
     msg.copy(out_data, len);
     out_data[len] = '\0';
     return out_data;
@@ -109,36 +123,41 @@ static void *voidptr_of_uint(uint64_t v)
   return (void *)(uintptr_t)(v & ~1);
 }
 
-static Cstore *cstore_of_handle(uint64_t handle)
+static cstore_obj *cstore_obj_of_handle(uint64_t handle)
 {
-    return (Cstore *) voidptr_of_uint(handle);
+    return (cstore_obj *) voidptr_of_uint(handle);
 }
 
 uint64_t
 vy_cstore_init(void)
 {
-    Cstore *handle = Cstore::createCstore(false);
+    cstore_obj *handle = create_handle();
     return uint_of_voidptr(handle);
 }
 
 void
 vy_cstore_free(uint64_t handle)
 {
-    Cstore *h = cstore_of_handle(handle);
+    cstore_obj *h = cstore_obj_of_handle(handle);
+    for (char * x: h->output) {
+        free(x);
+    }
+    delete h->cstore;
     delete h;
 }
 
 int
 vy_in_session(uint64_t handle)
 {
-    Cstore *h = cstore_of_handle(handle);
+    Cstore *h = cstore_obj_of_handle(handle)->cstore;
     return h->inSession() ? 1 : 0;
 }
 
 const char *
 vy_validate_path(uint64_t handle, const void** path_ptr, size_t len)
 {
-    Cstore *cstore = cstore_of_handle(handle);
+    cstore_obj *obj = cstore_obj_of_handle(handle);
+    Cstore *cstore = obj->cstore;
     const char **path = (const char **) path_ptr;
     Cpath path_comps = Cpath(path, len);
     const char *out_data;
@@ -154,7 +173,7 @@ vy_validate_path(uint64_t handle, const void** path_ptr, size_t len)
         out_str.append(redirect.get_redirected_output());
     }
 
-    out_data = out_data_copy(out_str);
+    out_data = out_data_copy(out_str, obj);
     out_stream = NULL;
     return out_data;
 }
@@ -162,7 +181,8 @@ vy_validate_path(uint64_t handle, const void** path_ptr, size_t len)
 const char *
 vy_set_path(uint64_t handle, const void** path_ptr, size_t len)
 {
-    Cstore *cstore = cstore_of_handle(handle);
+    cstore_obj *obj = cstore_obj_of_handle(handle);
+    Cstore *cstore = obj->cstore;
     const char **path = (const char **) path_ptr;
     Cpath path_comps = Cpath(path, len);
     const char *out_data;
@@ -178,7 +198,7 @@ vy_set_path(uint64_t handle, const void** path_ptr, size_t len)
         out_str.append(redirect.get_redirected_output());
     }
 
-    out_data = out_data_copy(out_str);
+    out_data = out_data_copy(out_str, obj);
     out_stream = NULL;
     return out_data;
 }
@@ -186,7 +206,8 @@ vy_set_path(uint64_t handle, const void** path_ptr, size_t len)
 const char *
 vy_legacy_set_path(uint64_t handle, const void** path_ptr, size_t len)
 {
-    Cstore *cstore = cstore_of_handle(handle);
+    cstore_obj *obj = cstore_obj_of_handle(handle);
+    Cstore *cstore = obj->cstore;
     const char **path = (const char **) path_ptr;
     Cpath path_comps = Cpath(path, len);
     const char *out_data;
@@ -210,7 +231,7 @@ vy_legacy_set_path(uint64_t handle, const void** path_ptr, size_t len)
     }
 
 out:
-    out_data = out_data_copy(out_str);
+    out_data = out_data_copy(out_str, obj);
     out_stream = NULL;
     return out_data;
 }
@@ -218,7 +239,8 @@ out:
 const char *
 vy_delete_path(uint64_t handle, const void** path_ptr, size_t len)
 {
-    Cstore *cstore = cstore_of_handle(handle);
+    cstore_obj *obj = cstore_obj_of_handle(handle);
+    Cstore *cstore = obj->cstore;
     const char **path = (const char **) path_ptr;
     Cpath path_comps = Cpath(path, len);
     const char *out_data;
@@ -234,7 +256,7 @@ vy_delete_path(uint64_t handle, const void** path_ptr, size_t len)
         out_str.append(redirect.get_redirected_output());
     }
 
-    out_data = out_data_copy(out_str);
+    out_data = out_data_copy(out_str, obj);
     out_stream = NULL;
     return out_data;
 }
