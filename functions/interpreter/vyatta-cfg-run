@@ -353,6 +353,9 @@ vyatta_cfg_cmd_run ()
       vyatta_config_edit "${@:2}"
     elif [[ "$cmd" == "show" ]]; then 
       vyatta_config_show "${@:2}"
+    elif [[ "$cmd" == "set" ]]; then
+      cmd="/usr/libexec/vyos/vyconf/vy_set"
+      output=$($cmd "${@:2}")
     else 
       cmd="/opt/vyatta/sbin/my_$cmd"
       output=$($cmd "${@:2}")
