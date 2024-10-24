@@ -136,7 +136,55 @@ vy_in_session(uint64_t handle)
 }
 
 const char *
+vy_validate_path(uint64_t handle, const void** path_ptr, size_t len)
+{
+    Cstore *cstore = cstore_of_handle(handle);
+    const char **path = (const char **) path_ptr;
+    Cpath path_comps = Cpath(path, len);
+    const char *out_data;
+    std::string out_str = "";
+    int res;
+
+    out_stream = stdout;
+    stdout_redirect redirect = stdout_redirect();
+
+    res = cstore->validateSetPath(path_comps);
+    if (!res) {
+        out_str = "\nInvalid set path: " + path_comps.to_string() + "\n";
+        out_str.append(redirect.get_redirected_output());
+    }
+
+    out_data = out_data_copy(out_str);
+    out_stream = NULL;
+    return out_data;
+}
+
+const char *
 vy_set_path(uint64_t handle, const void** path_ptr, size_t len)
+{
+    Cstore *cstore = cstore_of_handle(handle);
+    const char **path = (const char **) path_ptr;
+    Cpath path_comps = Cpath(path, len);
+    const char *out_data;
+    std::string out_str = "";
+    int res;
+
+    out_stream = stdout;
+    stdout_redirect redirect = stdout_redirect();
+
+    res = cstore->setCfgPath(path_comps);
+    if (!res) {
+        out_str = "\nSet config path failed: " + path_comps.to_string() + "\n";
+        out_str.append(redirect.get_redirected_output());
+    }
+
+    out_data = out_data_copy(out_str);
+    out_stream = NULL;
+    return out_data;
+}
+
+const char *
+vy_legacy_set_path(uint64_t handle, const void** path_ptr, size_t len)
 {
     Cstore *cstore = cstore_of_handle(handle);
     const char **path = (const char **) path_ptr;
