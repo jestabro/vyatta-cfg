@@ -166,7 +166,7 @@ vyatta_config_commit-confirm ()
   local yes_flag=""
   local in_comment=0
   for arg in "$@"; do
-    if [ "$arg" = "-y" ] && [ "$in_comment" = "0" ]; then
+    if [ "$arg" = "no-prompt" ] && [ "$in_comment" = "0" ]; then
       yes_flag="-y"
       continue
     fi
